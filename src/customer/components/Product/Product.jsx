@@ -25,7 +25,7 @@ export default function Product() {
   const navigate=useNavigate();
   const param=useParams();
   const dispatch=useDispatch();
-  const {product}=useSelector(store=>store);
+  const {products}=useSelector(store=>store);
 
   const decodedQueryString=decodeURIComponent(location.search);
   const searchParamms=new URLSearchParams(decodedQueryString);
@@ -64,22 +64,22 @@ export default function Product() {
     navigate({search:`?${query}`})
   }
 
-  const initProducts = () => {
-    const data={
-      category:param.lavelThree,
-      colors:colorValue || [],
-      sizes:sizeValue || [],
-      minPrice:0,
-      maxPrice:100000000,
-      minDiscount:discount || 0,  
-      sort:sortValue || "price_low",
-      pageNumber:pageNumber-1 ,
-      pageSize:10,
-      stock:stock,
-    }
-    dispatch(findProducts(data));
-  }
-  initProducts();
+  // const initProducts = () => {
+  //   const data={
+  //     category:param.lavelThree,
+  //     colors:colorValue || [],
+  //     sizes:sizeValue || [],
+  //     minPrice:0,
+  //     maxPrice:100000000,
+  //     minDiscount:discount || 0,  
+  //     sort:sortValue || "price_low",
+  //     pageNumber:pageNumber-1 ,
+  //     pageSize:10,
+  //     stock:stock,
+  //   }
+  //   dispatch(findProducts(data));
+  // }
+  // initProducts();
 
 
   useEffect(()=>{
@@ -339,14 +339,14 @@ export default function Product() {
               {/* Product grid */}
               <div className="lg:col-span-3 xs:col-span-2 ">
                 <div className='flex flex-wrap justify-center bg-white py-5' >
-                    {iphones.map((item)=><ProductCard product={item} />)}
+                    {products.products?.content?.map((item)=><ProductCard product={item} />)}
                 </div>
               </div>
             </div>
           </section>
           <section className="w-full px-4" >
             <div className="px-4 py-5 flex justify-center" >
-              {/* <Pagination count={} color='secondary'  onChange={handlePaginationChange}  /> */}
+              <Pagination count={products.products?.totalPages } color='secondary'  onChange={handlePaginationChange}  />
             </div> 
           </section>
         </main>
