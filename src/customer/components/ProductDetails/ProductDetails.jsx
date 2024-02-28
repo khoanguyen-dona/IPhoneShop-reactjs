@@ -1,11 +1,18 @@
 
-import { useState } from 'react'
-import { RadioGroup } from '@headlessui/react'
-import { Rating, Grid, LinearProgress, Box } from '@mui/material'
-import ProductReviewCard from './ProductReviewCard'
-import { iphones } from '../../../Data/iphones'
-import HomeSectionCard from '../HomeSectionCard/HomeSectionCard'
-import { useNavigate } from 'react-router-dom'
+import { useState } from 'react';
+import { RadioGroup } from '@headlessui/react';
+import { Rating, Grid, LinearProgress, Box } from '@mui/material';
+import ProductReviewCard from './ProductReviewCard';
+import { iphones } from '../../../Data/iphones';
+import HomeSectionCard from '../HomeSectionCard/HomeSectionCard';
+import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useEffect } from 'react';
+import { findProductsById } from '../../../State/Product/Action';
+import { useSelector } from 'react-redux';
+import { addItemToCart } from '../../../State/Cart/Action';
+
 const product = {
   name: 'Basic Tee 6-Pack',
   price: '$192',
@@ -66,9 +73,23 @@ export default function ProductDetails() {
   const [selectedColor, setSelectedColor] = useState(product.colors[0])
   const [selectedSize, setSelectedSize] = useState(product.sizes[2])
   const navigate=useNavigate();
+  const params=useParams();
+  const dispatch=useDispatch();
+  const {products}=useSelector(store=>store);
+
+  console.log("-----",params.productId);
+
   const handleAddToCart = () => {
+    const data={productId:params.productId,size:selectedSize.name};
+    console.log("handle add to cart ",data);
+    dispatch(addItemToCart(data));
     navigate('/cart')
   }
+
+  useEffect(()=>{
+    const data={productId:params.productId};
+    dispatch(findProductsById(data));
+  },[params.productId])
 
   return (
     <div className="bg-white lg:px-20  ">
@@ -107,9 +128,9 @@ export default function ProductDetails() {
             <div className="flex flex-col items-center ">
                 <div className="  overflow-hidden rounded-lg max-w-[30rem] max-h-[35rem]">
                     <img
-                    src={product.images[0].src}
+                    src={products.product?.imageUrl}
                     alt={product.images[0].alt}
-                    className="h-full w-full object-cover object-center"
+                    className="h-[25rem]  lg:h-[30rem] w-auto object-cover object-center"
                     />
                 </div>
                 <div className="flex flex-wrap space-x-5 justify-center">
@@ -128,15 +149,15 @@ export default function ProductDetails() {
             {/* Product info */}
             <div className="lg:col-span-1 max-auto max-w-2xl px-4 pb-16 lg:max-w-7xl  lg:pb-24  ">
                 <div className="lg:col-span-2  lg:pr-8">
-                    <h1 className="text-3xl lg:text-3xl font-bold tracking-tight text-gray-900 ">Iphone 14</h1>
+                    <h1 className="text-3xl lg:text-3xl font-bold tracking-tight text-gray-900 ">{products.product?.title}</h1>
                 </div>
 
             {/* Options */}
                 <div className="mt-4 lg:row-span-3 lg:mt-0">
                     <div className='flex space-x-5 items-center text-lg lg:text-xl' >
-                        <p className="text-3xl tracking-tight text-gray-500">21.900.000 đ</p>
-                        <p className="text-3xl line-through tracking-tight text-gray-500">21.900.000 đ</p>
-                        <p className='font-bold' >-14%</p>   
+                        <p className="text-3xl tracking-tight text-gray-500">{products.product?.discountedPrice} đ</p>
+                        <p className="text-3xl line-through tracking-tight text-gray-500">{products.product?.price} đ</p>
+                        <p className='font-bold' >-{products.product?.discountPercent}%</p>   
                     </div>
 
                     {/* Reviews */}

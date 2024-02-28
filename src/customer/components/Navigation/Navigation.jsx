@@ -1,13 +1,18 @@
-
+import * as React from 'react';
 import { Fragment, useState } from 'react'
 import { Dialog, Popover, Tab, Transition, Menu } from '@headlessui/react'
 import { Bars3Icon, MagnifyingGlassIcon, ShoppingBagIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { useNavigate } from 'react-router-dom'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
-
-
-
-
+import { Avatar } from '@mui/material';
+import AuthModal from '../../Auth/AuthModal'
+import Button from '@mui/material/Button'
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+import { getUser } from '../../../State/Auth/Action';
+import { logout } from '../../../State/Auth/Action';
 // navbar data
 const navigation = {
   categories: [
@@ -33,10 +38,10 @@ const navigation = {
           id: 'clothing',
           name: 'Clothing',
           items: [
-            { name: 'Tops', href: '#' },
-            { name: 'Dresses', href: '#' },
-            { name: 'Pants', href: '#' },
-            { name: 'Denim', href: '#' },
+            { name: 'Iphone', href: '#' },
+            { name: 'iphone', href: '#' },
+            { name: '64GB', href: '#' },
+            { name: '128GB', href: '#' },
             { name: 'Sweaters', href: '#' },
             { name: 'T-Shirts', href: '#' },
             { name: 'Jackets', href: '#' },
@@ -141,13 +146,58 @@ function classNames(...classes) {
 }
 
 export default function Navigation() {
-  const [open, setOpen] = useState(false)
-  const navigate=useNavigate()
+  const [open, setOpen] = React.useState(false);
+  const navigate=useNavigate();
+
+  const[openAuthModal,setOpenAuthModal]=React.useState(false);
+  const[anchorE1, setAnchorE1]=useState(null);
+  const openUserMenu = Boolean(anchorE1);
+  const jwt=localStorage.getItem("jwt");
+  const {auth}=useSelector(store=>store)
+  const dispatch=useDispatch();
+  const location=useLocation();
+
+  const handleUserClick = (event) => {
+    setAnchorE1(event.currentTarget);
+  };
+  const handleCloseUserMenu = (event) => {
+    setAnchorE1(null);
+  };
+
+  const handleOpen = () => {
+    setOpenAuthModal(true);
+  }
+
+  const handleClose = () => {
+    setOpenAuthModal(false);
+    
+  }  
   const handleCategoryClick = (category, section, item, close) => {
     navigate(`/${category.id}/${section.id}/${item.name}`);
     close();
   }
+
+  useEffect(()=>{
+    if(jwt){
+      dispatch(getUser(jwt));
+    }
+  },[jwt,auth.jwt])
+
+  useEffect(()=>{
+    if(auth.user){
+      handleClose();
+    }
+    if(location.pathname==="/login" || location.pathname==="/register" ){
+      navigate(-1);
+    }
+  },[auth.user])
   
+  const handleLogout=()=>{
+    dispatch(logout());
+    handleCloseUserMenu();
+  }
+
+
 
   return (
     <div className="bg-white ">
@@ -264,9 +314,9 @@ export default function Navigation() {
 
                 <div className="space-y-6 border-t border-gray-200 px-4 py-6">
                   <div className="flow-root">
-                    <a href="#" className="-m-2 block p-2 font-medium text-gray-900">
+                    <Button onClick={handleOpen}  href="#" className="-m-2 block p-2 font-medium text-gray-900">
                       Sign in
-                    </a>
+                    </Button>
                   </div>
                   <div className="flow-root">
                     <a href="#" className="-m-2 block p-2 font-medium text-gray-900">
@@ -332,7 +382,7 @@ export default function Navigation() {
                           <div className="relative flex">
                             <Popover.Button
                               className={classNames(
-                                open
+                                false
                                   ? 'border-indigo-600 text-indigo-600'
                                   : 'border-transparent text-gray-700 hover:text-gray-800',
                                 'relative z-10 -mb-px flex items-center border-b-2 pt-px text-sm font-medium transition-colors duration-200 ease-out'
@@ -423,82 +473,87 @@ export default function Navigation() {
                   ))}
                 </div>
               </Popover.Group>
-
+                  
               <div className="ml-auto  space-x-5 flex items-center">
                 <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
-                  <a href="#" className="text-sm font-medium text-gray-700 hover:text-gray-800">
-                    Sign in
-                  </a>
-                  <span className="h-6 w-px bg-gray-200" aria-hidden="true" />
-                  <a href="#" className="text-sm font-medium text-gray-700 hover:text-gray-800">
-                    Create account
-                  </a>
-                </div>
-                {/* account toggle */}
-                <div>
-                <Menu as="div" className="relative inline-block text-left">
-                  <div>
-                    <Menu.Button className="inline-flex w-full justify-center gap-x-1.5  text-sm font-semibold text-gray-900 shadow-sm  hover:bg-gray-50">
-                      Account
-                      <ChevronDownIcon className="-mr-1 h-5 w-5 text-gray-400" aria-hidden="true" />
-                    </Menu.Button>
-                  </div>
-
-                  <Transition
-                    as={Fragment}
-                    enter="transition ease-out duration-100"
-                    enterFrom="transform opacity-0 scale-95"
-                    enterTo="transform opacity-100 scale-100"
-                    leave="transition ease-in duration-75"
-                    leaveFrom="transform opacity-100 scale-100"
-                    leaveTo="transform opacity-0 scale-95"
-                  >
-                    <Menu.Items className="absolute left-0 z-10 mt-2 w-28 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                      <div className="py-1">
-                        <Menu.Item>
-                          {({ active }) => (
-                            <a
-                              href="#"
-                              className={classNames(
-                                active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                                'block px-4 py-2 text-sm'
-                              )}
-                            >
-                              Profile
-                            </a>
-                          )}
-                        </Menu.Item>
-                        <Menu.Item>
-                          {({ active }) => (
-                            <a
-                              onClick={()=>navigate('/account/order')}
-                              className={classNames(
-                                active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                                'block px-4 py-2 text-sm'
-                              )}
-                            >
-                              My Orders
-                            </a>
-                          )}
-                        </Menu.Item>
-                        <Menu.Item>
-                          {({ active }) => (
-                            <a
-                              href="#"
-                              className={classNames(
-                                active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                                'block px-4 py-2 text-sm'
-                              )}
-                            >
-                              Logout
-                            </a>
-                          )}
-                        </Menu.Item>
-                       
+                  {auth.user?.firstName ? (
+                    <div>
+                      <Menu as="div" className="relative inline-block text-left">
+                      <div>
+                        <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-lg p-1 text-sm font-semibold text-gray-900 shadow-sm  hover:bg-gray-200">
+                          <Avatar >{auth.user?.firstName[0].toUpperCase()} </Avatar>
+                          <ChevronDownIcon className="mr-1 h-5 w-5 mt-3 text-gray-400" aria-hidden="true" />
+                        </Menu.Button>
                       </div>
-                    </Menu.Items>
-                  </Transition>
-                </Menu>
+    
+                      <Transition
+                        as={Fragment}
+                        enter="transition ease-out duration-100"
+                        enterFrom="transform opacity-0 scale-95"
+                        enterTo="transform opacity-100 scale-100"
+                        leave="transition ease-in duration-75"
+                        leaveFrom="transform opacity-100 scale-100"
+                        leaveTo="transform opacity-0 scale-95"
+                      >
+                        <Menu.Items className="absolute left-0 z-10 mt-2 w-28 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                          <div className="py-1">
+                            <Menu.Item>
+                              {({ active }) => (
+                                <a
+                                  href="#"
+                                  className={classNames(
+                                    active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                                    'block px-4 py-2 text-sm'
+                                  )}
+                                >
+                                  Profile
+                                </a>
+                              )}
+                            </Menu.Item>
+                            <Menu.Item>
+                              {({ active }) => (
+                                <a
+                                  onClick={()=>navigate('/account/order')}
+                                  className={classNames(
+                                    active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                                    'block px-4 py-2 text-sm'
+                                  )}
+                                >
+                                  My Orders
+                                </a>
+                              )}
+                            </Menu.Item>
+                            <Menu.Item onClick={handleLogout} >
+                              {({ active }) => (
+                                <a
+                                  href="#"
+                                  className={classNames(
+                                    active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                                    'block px-4 py-2 text-sm'
+                                  )}
+                                >
+                                  Logout
+                                </a>
+                              )}
+                            </Menu.Item>
+                            
+                          </div>
+                        </Menu.Items>
+                      </Transition>
+                      </Menu>
+                    </div>
+                  ):( 
+                  <div>
+                    <Button  onClick={handleOpen} href="#" className="text-sm font-medium text-gray-700 hover:text-gray-800">
+                      Sign in
+                    </Button>
+                    <span className="h-6 w-px bg-gray-200" aria-hidden="true" />
+                    <a href="#" className="text-sm font-medium text-gray-700 hover:text-gray-800">
+                      Create account
+                    </a>
+                  </div>
+                   )}             
+               
                 </div>
 
                 <div className="hidden lg:ml-8 lg:flex">
@@ -537,6 +592,7 @@ export default function Navigation() {
           </div>
         </nav>
       </header>
+      <AuthModal open={openAuthModal} handleClose={handleClose} />
     </div>
   )
 }
