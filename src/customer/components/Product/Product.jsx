@@ -64,24 +64,7 @@ export default function Product() {
     navigate({search:`?${query}`})
   }
 
-  // const initProducts = () => {
-  //   const data={
-  //     category:param.lavelThree,
-  //     colors:colorValue || [],
-  //     sizes:sizeValue || [],
-  //     minPrice:0,
-  //     maxPrice:100000000,
-  //     minDiscount:discount || 0,  
-  //     sort:sortValue || "price_low",
-  //     pageNumber:pageNumber-1 ,
-  //     pageSize:10,
-  //     stock:stock,
-  //   }
-  //   dispatch(findProducts(data));
-  // }
-  // initProducts();
-
-
+  
   useEffect(()=>{
     const [minPrice,maxPrice]=priceValue===null?[0,100000000]:priceValue.split("-").map(Number);
     const data={

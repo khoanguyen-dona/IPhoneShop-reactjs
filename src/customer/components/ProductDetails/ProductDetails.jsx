@@ -80,10 +80,11 @@ export default function ProductDetails() {
   console.log("-----",params.productId);
 
   const handleAddToCart = () => {
-    const data={productId:params.productId,size:selectedSize.name};
+    const data={productId:params.productId,size:selectedSize.name,price:products.product?.price
+      ,discountedPrice:products.product?.discountedPrice,quantity:1};
     console.log("handle add to cart ",data);
     dispatch(addItemToCart(data));
-    navigate('/cart')
+    navigate('/cart');
   }
 
   useEffect(()=>{

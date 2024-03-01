@@ -13,6 +13,8 @@ import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { getUser } from '../../../State/Auth/Action';
 import { logout } from '../../../State/Auth/Action';
+import { getCart } from '../../../State/Cart/Action';
+
 // navbar data
 const navigation = {
   categories: [
@@ -153,7 +155,8 @@ export default function Navigation() {
   const[anchorE1, setAnchorE1]=useState(null);
   const openUserMenu = Boolean(anchorE1);
   const jwt=localStorage.getItem("jwt");
-  const {auth}=useSelector(store=>store)
+  const {auth}=useSelector(store=>store);
+  const {cart}=useSelector(store=>store);
   const dispatch=useDispatch();
   const location=useLocation();
 
@@ -176,10 +179,14 @@ export default function Navigation() {
     navigate(`/${category.id}/${section.id}/${item.name}`);
     close();
   }
+  const handleCartClick = () =>{
+    navigate('/cart');
+  }
 
   useEffect(()=>{
     if(jwt){
       dispatch(getUser(jwt));
+      dispatch(getCart());
     }
   },[jwt,auth.jwt])
 
@@ -578,13 +585,14 @@ export default function Navigation() {
 
                 {/* Cart */}
                 <div className="ml-4 flow-root lg:ml-6">
-                  <a href="#" className="group -m-2 flex items-center p-2">
-                    <ShoppingBagIcon
+                  
+                  <a  className="group -m-2 flex items-center p-2" onCLick={handleCartClick} >
+                    <ShoppingBagIcon onCLick={handleCartClick}
                       className="h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
                       aria-hidden="true"
                     />
-                    <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">0</span>
-                    <span className="sr-only">items in cart, view bag</span>
+                    <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">{cart.cart?.totalItem}</span>
+                    
                   </a>
                 </div>
               </div>
